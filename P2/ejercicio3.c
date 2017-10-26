@@ -4,7 +4,6 @@
 #include <pthread.h>
 #include <time.h>
 #include <string.h>
-#define MAX 10
 typedef struct vec{
 	int *v;
 	int n;
@@ -13,31 +12,36 @@ int *random_array(int n);
 void *sub_suma(sub_vec *a);
 int main(int argc, char **argv){
 	srand(time(NULL));
+	
 	if(argc!=2){
-		printf("Error en la llamada: %s <numero_vectores>\n", argv[0]);
+		printf("Error en la llamada: %s <nvector>\n", argv[0]);
 		exit(-1);
 	}
-	int numero_vectores=atoi(argv[1]);	
-	int *v=random_array(MAX);
+	int total=10;
+	int nvector=atoi(argv[1]);	
+	int *v=random_array(total);
 	int *sumatotal;
-	int numero_elementos_sub_arrays=MAX/numero_vectores;
+	int elementos=total/nvector;
 	
-	pthread_t ids[numero_vectores];
-	sub_vec array[numero_vectores];
-	int i=0, aux=numero_elementos_sub_arrays;
+	pthread_t ids[nvector];
+	sub_vec array[nvector];
+	int i=0, aux=0, resto=0;
 
-	while(i<numero_vectores || aux<MAX){//mal
-		array[i].v=&v[aux]; array[i].n=aux;
+	while(i<nvector && aux<total){
+	
+		if(aux==elementos*nvector - elementos){
+			resto=total%nvector;//me falla el resto
+			//printf("hola\n");
+		}		
+		array[i].v=&v[aux]; array[i].n=elementos+resto;
 		pthread_create(&ids[i], NULL, (void *)sub_suma, &array[i]);
-		i++; aux+=numero_elementos_sub_arrays;
-			
-		if(aux==MAX - numero_elementos_sub_arrays*numero_vectores){
-			aux=numero_elementos_sub_arrays + MAX%numero_vectores;
-		}
+		i++; aux+=elementos;
+	
+		//printf("aux--->%i\n", aux);
 		usleep(10000);
 	}
 	
-	for(int j=0; j<numero_vectores; j++){
+	for(int j=0; j<nvector; j++){
 		pthread_join(ids[j], (void **)&sumatotal);
 		printf("La suma del subvector %i es=%i\n", j, *sumatotal);
 	}
