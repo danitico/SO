@@ -1,3 +1,8 @@
+/*
+ * EJERCICIO 3
+ * ejercicio3.c
+ * Daniel Ranchal Parrado
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>

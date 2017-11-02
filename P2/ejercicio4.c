@@ -1,3 +1,8 @@
+/*
+ * EJERCICIO 4
+ * ejercicio4.c
+ * Daniel Ranchal Parrado
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
