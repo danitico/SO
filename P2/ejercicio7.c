@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <semaphore.h>
-#define CLIENTES 8
+#define CLIENTES 5
 inline void imprimirbuffer(int *v);
 inline void decrementarstock(int n, int cantidad);
 inline void incrementarstock(int n, int cantidad);
@@ -27,20 +27,26 @@ int main(int argc, char **argv){
 		printf("Se aborta el programa checkpoint 1\n");
 		exit(-1);
 	}
+	if((pthread_mutex_init(&sem_p, NULL))!=0){
+		printf("Se aborta el programa checkpoint 1.1\n");
+		exit(-1);
+	}
 	/*
 		Creamos aqui los hilos cliente y proveedor
 	*/
 	imprimirbuffer(v);
-	for(int i=0; i<CLIENTES; i++){
+	/*for(int i=0; i<CLIENTES; i++){
 		pthread_create(&clientes[i], NULL, cliente, NULL);
-	}
+	}*/
 	for(int j=0; j<5; j++){
 		pthread_create(&proveedores[j], NULL, (void*)proveedor, &j);
+		pthread_create(&clientes[j], NULL, cliente, NULL);
 	}
-	for(int i=0; i<CLIENTES; i++){
+	/*for(int i=0; i<CLIENTES; i++){
 		pthread_join(clientes[i], NULL);
-	}
+	}*/
 	for(int j=0; j<5; j++){
+		pthread_join(clientes[j], NULL);
 		pthread_join(proveedores[j], NULL);
 	}
 	imprimirbuffer(v);
