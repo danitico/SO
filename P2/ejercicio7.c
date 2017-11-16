@@ -34,7 +34,7 @@ int main(int argc, char **argv){
 	/*
 		Creamos aqui los hilos cliente y proveedor
 	*/
-	imprimirbuffer(v);
+	//imprimirbuffer(v);
 	/*for(int i=0; i<CLIENTES; i++){
 		pthread_create(&clientes[i], NULL, cliente, NULL);
 	}*/
@@ -49,24 +49,27 @@ int main(int argc, char **argv){
 		pthread_join(clientes[j], NULL);
 		pthread_join(proveedores[j], NULL);
 	}
-	imprimirbuffer(v);
+	//imprimirbuffer(v);
 	exit(EXIT_SUCCESS);
 }
 void aleatorio(int *v){
 	for(int i=0; i<5; i++){
-		v[i]=rand()%(51);
+		v[i]=rand()%(301);
 	}
 }
 void *cliente(){
 	int n=rand()%5;//Vemos que modelo va a comprar el cliente
-	int cantidad=rand()%(v[n]+1);
+	int cantidad=rand()%(v[n]);
 
 	if((pthread_mutex_lock(&sem_c))!=0){
 		printf("Se aborta el programa checkpoint 2\n");
 		exit(-1);
 	}
 	//Entramos en la seccion critica
+	printf("cliente\n");	
+	imprimirbuffer(v);
 	decrementarstock(n, cantidad);//decrementa el stock del modelo
+	imprimirbuffer(v);	
 	//Salimos de la seccion critica	
 	if((pthread_mutex_unlock(&sem_c))!=0){
 		printf("Se aborta el programa checkpoint 3\n");
@@ -83,7 +86,10 @@ void *proveedor(int *num_modelo){
 		exit(-1);
 	}
 	//Entramos en la seccion critica
-	incrementarstock(*num_modelo, rand()%11);
+	printf("proveedor\n");
+	imprimirbuffer(v);	
+	incrementarstock(*num_modelo, rand()%51);
+	imprimirbuffer(v);	
 	//Salimos de la seccion critica
 	if((pthread_mutex_unlock(&sem_c))!=0){
 		printf("Se aborta el programa checkpoint 6\n");
