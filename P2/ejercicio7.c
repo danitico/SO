@@ -34,17 +34,10 @@ int main(int argc, char **argv){
 	/*
 		Creamos aqui los hilos cliente y proveedor
 	*/
-	//imprimirbuffer(v);
-	/*for(int i=0; i<CLIENTES; i++){
-		pthread_create(&clientes[i], NULL, cliente, NULL);
-	}*/
 	for(int j=0; j<5; j++){
 		pthread_create(&proveedores[j], NULL, (void*)proveedor, &j);
 		pthread_create(&clientes[j], NULL, cliente, NULL);
 	}
-	/*for(int i=0; i<CLIENTES; i++){
-		pthread_join(clientes[i], NULL);
-	}*/
 	for(int j=0; j<5; j++){
 		pthread_join(clientes[j], NULL);
 		pthread_join(proveedores[j], NULL);
