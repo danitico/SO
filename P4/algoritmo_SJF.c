@@ -11,13 +11,12 @@ typedef struct params{
     int t_ret;
     int t_esp;    
 }parametros;
-int getMenor(parametros *a, int ciclo, int i);
-int ordena(const void *a, const void *b);
-void imprime(parametros *a);
+int getMenor(parametros *a, int *b);
 int main(){
 	int i;
 	int ciclo=8, menor=0, anterior=0;
-	
+	int *ejec=(int*)malloc(5*sizeof(int));
+		
 	// Inicialización de los datos de procesos
 	parametros procesos[NPROC];    
 	strcpy(procesos[0].nombre, "A");
@@ -31,6 +30,7 @@ int main(){
 	strcpy(procesos[1].nombre, "B");
 	procesos[1].t_ejec = 4;
 	procesos[1].t_lleg = 1;
+	procesos[1].t_com=0;
 
 	strcpy(procesos[2].nombre, "C");
 	procesos[2].t_ejec = 9;
@@ -44,52 +44,44 @@ int main(){
 	procesos[4].t_ejec = 2;
 	procesos[4].t_lleg = 4;
 	
-	//qsort(procesos, NPROC, sizeof(parametros), ordena);
-
-	printf("\nProceso | t_comienzo | t_final | t_retorno | t_espera\n");
+	for(int j=1; j<5; j++){
+		ejec[j]=procesos[j].t_ejec;
+	}
+	ejec[0]=1001;
+	
+	printf("Proceso | t_comienzo | t_final | t_retorno | t_espera\n");
 	printf("-------------------------------------------------------\n");
 	for(i=0; i< NPROC; i++){
 		if(i==0){
 			procesos[i].t_com = 0;
 		}
 		else{
-			menor=getMenor(procesos, ciclo, i);		
-	
+			menor=getMenor(procesos, ejec);		
+		
 			if(i==1){procesos[menor].t_com = procesos[i-1].t_fin;}
 			else{procesos[menor].t_com = procesos[anterior].t_fin;}
+			
 			procesos[menor].t_fin = procesos[menor].t_com + procesos[menor].t_ejec;
 			procesos[menor].t_ret = procesos[menor].t_fin - procesos[menor].t_lleg;
 			procesos[menor].t_esp = procesos[menor].t_ret - procesos[menor].t_ejec;
-	
-			ciclo++; anterior=menor;
+		
+			anterior=menor;
 		}
-	printf("   %s \t    %d \t\t %d \t   %d \t      %d\n", procesos[i].nombre,procesos[i].t_com, procesos[i].t_fin, procesos[i].t_ret, procesos[i].t_esp);
 	}
-}
-void imprime(parametros *a){
-	for(int i=0; i<NPROC; i++){
-		printf("----->%s\n", a[i].nombre);
+	for(i=0; i< NPROC; i++){
+		printf("   %s \t    %d \t\t %d \t   %d \t      %d\n", procesos[i].nombre,procesos[i].t_com, procesos[i].t_fin, procesos[i].t_ret, procesos[i].t_esp);
 	}
-}
-int ordena(const void *a, const void *b){
-	parametros arg1=*(const parametros*)a;
-	parametros arg2=*(const parametros*)b;
 
-	if(arg1.t_ejec < arg2.t_ejec) return -1;
-	if(arg1.t_ejec > arg2.t_ejec) return 1;
-	return 0;
+	free(ejec);
 }
-int getMenor(parametros *a, int ciclo, int i){
+int getMenor(parametros *a, int *b){
 	int deseado=0, menor=1000;
-	printf("ciclo -- >%i\n", ciclo); 
-	for(; i<NPROC; i++){
-		if(a[i].t_lleg <= ciclo){
-			if(a[i].t_ejec < menor){
-				menor=a[i].t_ejec;
-				deseado=i;
-			}
+	for(int i=0; i<NPROC; i++){
+		if(b[i] < menor){
+			menor=b[i];
+			deseado=i;
 		}
 	}
-	printf("deseado -- >%i\n", deseado);
+	b[deseado]=1001;
 	return deseado;
 }	
