@@ -12,7 +12,7 @@ typedef struct params{
     int t_esp;    
 }parametros;
 int ciclos_ejecucion_0(parametros *v);
-void procesos_listos(parametros *v, parametros *procesos, int ciclos);
+void procesos_listos(parametros **v, parametros *procesos, int ciclos);
 void rol_fifo(parametros *v);
 void estadistica(parametros v, parametros *p, int ciclos);
 int main(){
@@ -46,7 +46,7 @@ int main(){
 	printf("-------------------------------------------------------\n");
 	
 	while(ciclos_ejecucion_0(v)==0){
-		procesos_listos(v, procesos, ciclos);
+		procesos_listos(&v, procesos, ciclos);
 		rol_fifo(v);
 		v[0].t_ejec-=3;
 
@@ -70,14 +70,16 @@ int ciclos_ejecucion_0(parametros *v){
 	}
 	else{return 0;}
 }
-void procesos_listos(parametros *v, parametros *procesos, int ciclos){
-	int n=sizeof(*v)/sizeof(parametros);	
-	//printf("hola->%i\n", n);
+void procesos_listos(parametros **v, parametros *procesos, int ciclos){
+	int n=sizeof(**v)/sizeof(parametros);	
+	printf("hola->%i\n", n);
 	for(int i=0; i<NPROC; i++){
 		if(ciclos==procesos[i].t_lleg){
-			v=(parametros*)realloc(v, (n+1)*sizeof(parametros));		
-			v[n]=procesos[i];
-			v[n].t_com=ciclos;
+			*v=realloc(*v, (n+1)*sizeof(parametros));		
+			//printf("hola\n");			
+			*v[n]=procesos[i];
+			
+			v[n]->t_com=ciclos;
 		}
 	}
 }
