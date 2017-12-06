@@ -56,29 +56,20 @@ int main(){
 		rol_fifo(v, &size);//rotar el vector
 		tiempo_comienzo(&v[0], procesos, ciclos);	
 		//printf("proceso en ejecucion -->%c\n", v[0].nombre[0]);
-		if(strcmp(v[0].nombre, "A")==0){
-			printf("ciclos restantes-->%i\n", v[0].t_ejec);
-		}
+		
 		v[0].t_ejec-=RODAJA;
-		if(strcmp(v[0].nombre, "A")==0){
-			printf("ciclos restantes después-->%i\n", v[0].t_ejec);
-			//printf("ciclos-->%i\n", ciclos);
-		}	
+			
 		if(v[0].t_ejec <= 0){
-			ciclos+=(v[0].t_ejec + RODAJA);			
-			if(strcmp(v[0].nombre, "A")==0){
-				printf("ciclos-->%i\n", ciclos);
+			if(strcmp(&v[0].nombre[1], "T")!=0){
+				ciclos+=(v[0].t_ejec + RODAJA);
+				estadistica(&v[0], procesos, ciclos);
 			}
-			estadistica(&v[0], procesos, ciclos);
 		}
 		else{
 			ciclos+=RODAJA;
 		}
-		if(strcmp(v[0].nombre, "A")==0){
-			printf("uhh ciclos-->%i\n", ciclos);
-		}
-		
-		//imprime(v);
+		printf("ciclos--->%i\n", ciclos);
+		imprime(v);
 	}
 	
 	printf("\nProceso | t_comienzo | t_final | t_retorno | t_espera\n");
@@ -103,16 +94,8 @@ void procesos_listos(parametros *v,parametros *procesos,int ciclos, int *size){
 	parametros aux;
 	for(int i=0;i<NPROC;i++){
 		if(ciclos==procesos[i].t_lleg){
-			if(*size==4){
-				aux=v[3];
-				v[3]=procesos[i];
-				v[*size]=aux;
-				(*size)++;
-			}		
-			else{
-				v[*size]=procesos[i];
-				(*size)++;
-			}
+			v[*size]=procesos[i];
+			(*size)++;
 		}
 	}     	
 } 
@@ -143,7 +126,6 @@ void tiempo_comienzo(parametros *v, parametros *p, int ciclos){
 	for(int i=0; i<NPROC; i++){
 		if(v->nombre[0]==p[i].nombre[0]){
 			if(v->t_ejec==p[i].t_ejec){
-				//printf("ciclo que empieza-->%i\n", ciclos);
 				v->t_com=ciclos;
 			}
 		}
