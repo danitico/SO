@@ -1,3 +1,21 @@
+/*
+ * EJERCICIO 3
+ * algoritmo_RR.c
+ * Daniel Ranchal Parrado
+ */
+/*
+	Este ejercicio se ha hecho de manera diferente al que hay en la tabla 3 de la documentación de la práctica, ya que este está mal
+	En la documentación, se dice que el tiempo de comienzo del proceso E es 12, una cosa que está mal. Mire mi justificacion:
+
+			CICLO 0 -------> A
+			CICLO 1 -------> A B
+			CICLO 2 -------> A B C
+			CICLO 3 -------> B C D A
+			CICLO 4 -------> B C D A ¡E!
+	
+	El proceso E se encola después del proceso A, por lo que el proceso E entrará tres ciclos después, ya que antes se ejecuta A
+	Por lo tanto la tabla 3 de la documentación está mal
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +35,6 @@ void procesos_listos(parametros *v, parametros *procesos, int ciclos, int *size)
 void rol_fifo(parametros *v, int *size);
 void estadistica(parametros *v, parametros *p, int ciclos);
 void tiempo_comienzo(parametros *v, parametros *p, int ciclos);
-void imprime(parametros *v);
 int main(){
 	int i, k=0, size=0, anterior=0;
 	int ciclos=0;
@@ -45,8 +62,10 @@ int main(){
 	procesos[4].t_ejec = 2;
 	procesos[4].t_lleg = 4;
 	
-		
+	//comprueba si se han ejecutado todos los procesos		
 	while(ciclos_ejecucion_0(v, &size)==0){
+		
+		//Comprueba si los procesos tienen que pasar a estado listo
 		for(; anterior<(ciclos+1); anterior++){		
 			procesos_listos(v, procesos, anterior, &size);
 		}
@@ -54,22 +73,22 @@ int main(){
 		anterior=ciclos+1;//para la lista de listos		
 		
 		rol_fifo(v, &size);//rotar el vector
-		tiempo_comienzo(&v[0], procesos, ciclos);	
-		//printf("proceso en ejecucion -->%c\n", v[0].nombre[0]);
-		
-		v[0].t_ejec-=RODAJA;
+		tiempo_comienzo(&v[0], procesos, ciclos);//Calcula el tiempo de comienzo de ejecucion de un proceso	
+				
+		v[0].t_ejec-=RODAJA;//Aplica la rodaja de tiempo de ejecucion correspondiente al proceso
 			
 		if(v[0].t_ejec <= 0){
+			/*En el caso en el que tiempo de ejecución sea 0 o negativo, significa
+			  significa que el proceso ya ha terminado de ejecutarse	*/			
 			if(strcmp(&v[0].nombre[1], "T")!=0){
 				ciclos+=(v[0].t_ejec + RODAJA);
+				//En el caso en el que v[0].t_ejec<0 se han aplicado ciclos de más, por lo que hay que quitarlos
 				estadistica(&v[0], procesos, ciclos);
 			}
 		}
 		else{
 			ciclos+=RODAJA;
 		}
-		printf("ciclos--->%i\n", ciclos);
-		imprime(v);
 	}
 	
 	printf("\nProceso | t_comienzo | t_final | t_retorno | t_espera\n");
@@ -100,7 +119,6 @@ void procesos_listos(parametros *v,parametros *procesos,int ciclos, int *size){
 	}     	
 } 
 void rol_fifo(parametros *v, int *size){
-	//printf("size--->%i\n", *size);
 	if((*size)>1){
 		parametros aux=v[0];
 		for(int i=0; i<(NPROC-1); i++){
@@ -112,9 +130,7 @@ void rol_fifo(parametros *v, int *size){
 void estadistica(parametros *v, parametros *p, int ciclos){		
 	for(int i=0; i<NPROC; i++){
 		if(strcmp(v->nombre, p[i].nombre)==0){
-			v->nombre[1]='T';
-			//printf("proceso %c\n", v->nombre[0]);
-			//printf("ciclos fin-->%i\n", ciclos);
+			v->nombre[1]='T';//T de terminado
 			p[i].t_com=v->t_com;
 			p[i].t_fin=ciclos;
 			p[i].t_ret=p[i].t_fin - p[i].t_lleg;
@@ -130,10 +146,4 @@ void tiempo_comienzo(parametros *v, parametros *p, int ciclos){
 			}
 		}
 	}
-}
-void imprime(parametros *v){
-	for(int i=0; i<5; i++){	
-		printf("-->%c %c\n", v[i].nombre[0], v[i].nombre[1]);
-	}
-	printf("\n");
 }

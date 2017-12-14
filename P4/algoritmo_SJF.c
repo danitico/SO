@@ -1,3 +1,8 @@
+/*
+ * EJERCICIO 2
+ * algoritmo_SJF.c
+ * Daniel Ranchal Parrado
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,7 +76,6 @@ int main(){
 	for(i=0; i< NPROC; i++){
 		printf("   %s \t    %d \t\t %d \t   %d \t      %d\n", procesos[i].nombre,procesos[i].t_com, procesos[i].t_fin, procesos[i].t_ret, procesos[i].t_esp);
 	}
-
 	free(ejec);
 }
 int getMenor(parametros *a, int *b){

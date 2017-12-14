@@ -1,3 +1,8 @@
+/*
+ * EJERCICIO 1
+ * algoritmo_FCFS.c
+ * Daniel Ranchal Parrado
+ */
 #include <stdio.h>
 #include <string.h>
 #define NPROC 5
