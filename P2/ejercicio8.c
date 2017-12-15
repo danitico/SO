@@ -1,129 +1,72 @@
-/*
- * EJERCICIO 8
- * ejercicio8.c
- * Daniel Ranchal Parrado
- */
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 #include <time.h>
-#include <semaphore.h>
-#define CLIENTES 5
-int buffer[5];
-pthread_mutex_t sem_p, sem_c;
-sem_t buff;
-int indice_consumidor=4, indice_productor=5;
-void *extraer();//Extrae elemento y lo deja a cero
-void *insertar();//Inserta en un elemento
-void aleatorio(int *v);//Inicializa un vector[5] con valores aleatorios
+#define PRODUCTOR 5
+#define CONSUMIDOR 5
+int camiseta[PRODUCTOR];
+pthread_mutex_t cliente, productor;
+void imprimirstock();
+void *Cliente();
+void *Productor();
 int main(){
 	srand(time(NULL));
-	pthread_t productores[CLIENTES];
-	pthread_t consumidores[CLIENTES];
+	pthread_t v1[CONSUMIDOR], v2[PRODUCTOR];
 
-	aleatorio(buffer);
+	pthread_mutex_init(&cliente, NULL);
+	pthread_mutex_init(&productor, NULL);
 
-	if((sem_init(&buff, 0, 5))!=0){
-		printf("Error al inicializar el semaforo general\n");
-		exit(-1);
-	}
-
-	if((pthread_mutex_init(&sem_c, NULL))!=0){
-		printf("Se aborta el programa checkpoint 1\n");
-		exit(-1);
-	}
-	if((pthread_mutex_init(&sem_p, NULL))!=0){
-		printf("Se aborta el programa checkpoint 1.1\n");
-		exit(-1);
-	}
-
-	/*
-		Creamos aqui los hilos cliente y proveedor
-	*/	
-
-	for(int i=0; i<CLIENTES; i++){
-		pthread_create(&productores[i], NULL, insertar, NULL);
-		pthread_create(&consumidores[i], NULL, extraer, NULL);
-	}
-
-	for(int j=0; j<5; j++){
-		pthread_join(consumidores[j], NULL);		
-		pthread_join(productores[j], NULL);
-	}
-
-	if((pthread_mutex_destroy(&sem_p))!=0){
-		printf("Error eliminar semaforo checkpoint 2\n");
-		exit(-1);
-	}
-	if((pthread_mutex_destroy(&sem_c))!=0){
-		printf("Error eliminar semaforo checkpoint 3\n");
-		exit(-1);
-	}		
-	exit(EXIT_SUCCESS);
-}
-void aleatorio(int *v){     
 	for(int i=0; i<5; i++){
-		v[i]=2;
+		camiseta[i]=rand()%20;
 	}
-}
-void imprimirbuffer(int *v){
-	printf("v[0]=%i v[1]=%i v[2]=%i v[3]=%i v[4]=%i\n", v[0], v[1], v[2], v[3], v[4]);
-}
-void *extraer(){
-	printf("proceso extraer\n");
-	imprimirbuffer(buffer);
-	if((pthread_mutex_lock(&sem_c))!=0){
-		printf("Se aborta el programa checkpoint 4\n");
-		exit(-1);
-	}
-	if((pthread_mutex_lock(&sem_p))!=0){
-		printf("Se aborta el programa checkpoint 5\n");
-		exit(-1);
-   }
-	
-	printf("extraer\n");
-	
-	sem_post(&buff);	
-	buffer[indice_consumidor]=0;
-	
-	indice_productor--;	
-	indice_consumidor--;
-	if((pthread_mutex_unlock(&sem_p))!=0){
-		printf("Se aborta el programa checkpoint 6\n");
-		exit(-1);
-	}
-	if((pthread_mutex_unlock(&sem_c))!=0){
-		printf("Se aborta el programa checkpoint 7\n");
-		exit(-1);
-   }
-	imprimirbuffer(buffer);
-}
-void *insertar(){
-	printf("proceso insertar\n");
-	imprimirbuffer(buffer);
-	if((pthread_mutex_lock(&sem_p))!=0){
-		printf("Se aborta el programa checkpoint 7\n");
-		exit(-1);
-	}
-	if((pthread_mutex_lock(&sem_c))!=0){
-		printf("Se aborta el programa checkpoint 8\n");
-		exit(-1);
-   }
-	printf("insertar\n");
 
-	sem_wait(&buff);	
-	buffer[indice_productor]=rand()%(50)+1;
-	
-	indice_productor++;
-	indice_consumidor++;
-
-	if((pthread_mutex_unlock(&sem_c))!=0){
-		printf("Se aborta el programa checkpoint 6\n");
-		exit(-1);
+	for(int i=0; i<5; i++){
+		pthread_create(&v1[i], NULL, Cliente, NULL);
+		pthread_create(&v2[i], NULL, Productor, NULL);
 	}
-	if((pthread_mutex_unlock(&sem_p))!=0){
-		printf("Se aborta el programa checkpoint 7\n");
-		exit(-1);
-   }
-	imprimirbuffer(buffer);
+
+	for(int i=0; i<5; i++){
+		pthread_join(v1[i], NULL);
+		pthread_join(v2[i], NULL);
+	}
+	
+	pthread_mutex_destroy(&cliente);
+	pthread_mutex_destroy(&productor);
 }
+void *Cliente(){
+	int modelo=rand()%5;
+	int cantidad=rand()%(20)+1;
+
+	pthread_mutex_lock(&cliente);
+	pthread_mutex_lock(&productor);
+
+	if(camiseta[modelo]>=cantidad){
+		camiseta[modelo]-=cantidad;
+		printf("Comprar %i del modelo %i\n", cantidad, modelo);
+	}
+	else{
+		printf("No es posible la compra de %i camisetas del modelo %i\n", cantidad, modelo);
+	}
+	imprimirstock();
+	
+	pthread_mutex_unlock(&cliente);
+	pthread_mutex_unlock(&productor);
+}
+void *Productor(){
+	int modelo=rand()%5;
+	int cantidad=rand()%(20)+1;
+
+	pthread_mutex_lock(&productor);
+
+	camiseta[modelo]+=cantidad;
+	printf("Producir %i camisetas del modelo %i\n", cantidad, modelo);
+	imprimirstock();
+
+	pthread_mutex_unlock(&productor);
+}
+void imprimirstock(){
+	for(int i=0; i<PRODUCTOR; i++){
+		printf("v[%i]=%i\n", i, camiseta[i]);
+	}
+}		 
