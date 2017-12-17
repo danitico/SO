@@ -3,7 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include "ejercicio2.h"
+#include "ejercicio1.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <rpc/pmap_clnt.h>
@@ -17,11 +17,12 @@
 #endif
 
 static void
-bases_datos_1(struct svc_req *rqstp, register SVCXPRT *transp)
+calculadora_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		INPUT_A a_1_arg;
-		INPUT_B b_1_arg;
+		INPUT_A_B a_1_arg;
+		INPUT_A_B b_1_arg;
+		INPUT_OUTPUT_C c_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -32,16 +33,22 @@ bases_datos_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
 		return;
 
-	case A:
-		_xdr_argument = (xdrproc_t) xdr_INPUT_A;
-		_xdr_result = (xdrproc_t) xdr_OUTPUT_A_B;
+	case a:
+		_xdr_argument = (xdrproc_t) xdr_INPUT_A_B;
+		_xdr_result = (xdrproc_t) xdr_OUTPUT_A;
 		local = (char *(*)(char *, struct svc_req *)) a_1_svc;
 		break;
 
-	case B:
-		_xdr_argument = (xdrproc_t) xdr_INPUT_B;
-		_xdr_result = (xdrproc_t) xdr_OUTPUT_A_B;
+	case b:
+		_xdr_argument = (xdrproc_t) xdr_INPUT_A_B;
+		_xdr_result = (xdrproc_t) xdr_OUTPUT_B;
 		local = (char *(*)(char *, struct svc_req *)) b_1_svc;
+		break;
+
+	case c:
+		_xdr_argument = (xdrproc_t) xdr_INPUT_OUTPUT_C;
+		_xdr_result = (xdrproc_t) xdr_INPUT_OUTPUT_C;
+		local = (char *(*)(char *, struct svc_req *)) c_1_svc;
 		break;
 
 	default:
@@ -69,15 +76,15 @@ main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 
-	pmap_unset (BASES_DATOS, BASES_DATOS_VER);
+	pmap_unset (CALCULADORA, CALCULADORA_VER);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, BASES_DATOS, BASES_DATOS_VER, bases_datos_1, IPPROTO_UDP)) {
-		fprintf (stderr, "%s", "unable to register (BASES_DATOS, BASES_DATOS_VER, udp).");
+	if (!svc_register(transp, CALCULADORA, CALCULADORA_VER, calculadora_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (CALCULADORA, CALCULADORA_VER, udp).");
 		exit(1);
 	}
 
@@ -86,8 +93,8 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "cannot create tcp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, BASES_DATOS, BASES_DATOS_VER, bases_datos_1, IPPROTO_TCP)) {
-		fprintf (stderr, "%s", "unable to register (BASES_DATOS, BASES_DATOS_VER, tcp).");
+	if (!svc_register(transp, CALCULADORA, CALCULADORA_VER, calculadora_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (CALCULADORA, CALCULADORA_VER, tcp).");
 		exit(1);
 	}
 

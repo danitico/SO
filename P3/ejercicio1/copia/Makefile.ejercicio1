@@ -3,18 +3,18 @@
 
 # Parameters
 
-CLIENT = ejercicio2_client
-SERVER = ejercicio2_server
+CLIENT = ejercicio1_client
+SERVER = ejercicio1_server
 
 SOURCES_CLNT.c = 
 SOURCES_CLNT.h = 
 SOURCES_SVC.c = 
 SOURCES_SVC.h = 
-SOURCES.x = ejercicio2.x
+SOURCES.x = ejercicio1.x
 
-TARGETS_SVC.c = ejercicio2_svc.c ejercicio2_server.c ejercicio2_xdr.c 
-TARGETS_CLNT.c = ejercicio2_clnt.c ejercicio2_client.c ejercicio2_xdr.c 
-TARGETS = ejercicio2.h ejercicio2_xdr.c ejercicio2_clnt.c ejercicio2_svc.c ejercicio2_client.c ejercicio2_server.c
+TARGETS_SVC.c = ejercicio1_svc.c ejercicio1_server.c ejercicio1_xdr.c 
+TARGETS_CLNT.c = ejercicio1_clnt.c ejercicio1_client.c ejercicio1_xdr.c 
+TARGETS = ejercicio1.h ejercicio1_xdr.c ejercicio1_clnt.c ejercicio1_svc.c ejercicio1_client.c ejercicio1_server.c
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)

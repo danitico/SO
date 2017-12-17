@@ -8,12 +8,12 @@
 
 
 void
-bases_datos_1(char *host)
+bases_datos_1(char *host, char *fichero)
 {
 	CLIENT *clnt;
-	void  *result_1;
+	OUTPUT_A_B  *result_1;
 	INPUT_A  a_1_arg;
-	void  *result_2;
+	OUTPUT_A_B  *result_2;
 	INPUT_B  b_1_arg;
 
 #ifndef	DEBUG
@@ -23,14 +23,52 @@ bases_datos_1(char *host)
 		exit (1);
 	}
 #endif	/* DEBUG */
+	int opcion=0;
+	printf("1.Buscar registros por apellido\n");
+	printf("2.Buscar registros por provincia y por edad\n");
+	printf("Seleccione una de las opciones\n");
+	scanf("%i", &opcion);
 
-	result_1 = a_1(&a_1_arg, clnt);
-	if (result_1 == (void *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-	result_2 = b_1(&b_1_arg, clnt);
-	if (result_2 == (void *) NULL) {
-		clnt_perror (clnt, "call failed");
+	switch(opcion){
+		case 1:
+			printf("Introduzca el apellido\n");
+			scanf("%s", a_1_arg.apellido);
+			a_1_arg.nombre_fichero=fichero;			
+			result_1 = a_1(&a_1_arg, clnt);
+			if (result_1 == (OUTPUT_A_B *) NULL) {
+				clnt_perror (clnt, "call failed");
+			}
+			else{
+				printf("Los resultados con esa búsqueda son:\n");
+				for(int i=0; i<(result_1->a.a_len); i++){
+					printf("Nombre: %s\n", result_1->a.a_val[i].nombrecompleto);
+					printf("Edad: %i\n", result_1->a.a_val[i].edad);
+					printf("Provincia: %s\n", result_1->a.a_val[i].provincia);
+				}
+			}
+			break;
+		case 2:
+			printf("Introduzca la provincia\n");
+			scanf("%s", b_1_arg.provincia);
+			printf("Introduzca la edad\n");
+			scanf("%i", &b_1_arg.edad);
+			a_1_arg.nombre_fichero=fichero;
+			result_2 = b_1(&b_1_arg, clnt);
+			if (result_2 == (OUTPUT_A_B *) NULL) {
+				clnt_perror (clnt, "call failed");
+			}
+			else{
+				printf("Los resultados con esa búsqueda son:\n");
+				for(int i=0; i<(result_2->a.a_len); i++){
+					printf("Nombre: %s\n", result_2->a.a_val[i].nombrecompleto);
+					printf("Edad: %i\n", result_2->a.a_val[i].edad);
+					printf("Provincia: %s\n", result_2->a.a_val[i].provincia);
+				}
+			}
+			break;
+		default:
+			printf("Error al seleccionar una opcion ya que no está disponible\n");
+			break;
 	}
 #ifndef	DEBUG
 	clnt_destroy (clnt);
@@ -42,12 +80,15 @@ int
 main (int argc, char *argv[])
 {
 	char *host;
+	char *fichero;
 
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
+	if (argc < 3) {
+		printf ("usage: %s <server_host> <nombre_fichero>\n", argv[0]);
 		exit (1);
 	}
 	host = argv[1];
-	bases_datos_1 (host);
+	fichero=argv[2];
+	
+	bases_datos_1 (host, fichero);
 exit (0);
 }

@@ -9,32 +9,32 @@
 /* Default timeout can be changed using clnt_control() */
 static struct timeval TIMEOUT = { 25, 0 };
 
-void *
+OUTPUT_A_B *
 a_1(INPUT_A *argp, CLIENT *clnt)
 {
-	static char clnt_res;
+	static OUTPUT_A_B clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call (clnt, a,
+	if (clnt_call (clnt, A,
 		(xdrproc_t) xdr_INPUT_A, (caddr_t) argp,
-		(xdrproc_t) xdr_void, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_OUTPUT_A_B, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return ((void *)&clnt_res);
+	return (&clnt_res);
 }
 
-void *
+OUTPUT_A_B *
 b_1(INPUT_B *argp, CLIENT *clnt)
 {
-	static char clnt_res;
+	static OUTPUT_A_B clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call (clnt, b,
+	if (clnt_call (clnt, B,
 		(xdrproc_t) xdr_INPUT_B, (caddr_t) argp,
-		(xdrproc_t) xdr_void, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_OUTPUT_A_B, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}
-	return ((void *)&clnt_res);
+	return (&clnt_res);
 }

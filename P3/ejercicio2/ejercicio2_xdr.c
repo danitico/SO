@@ -6,6 +6,20 @@
 #include "ejercicio2.h"
 
 bool_t
+xdr_CLIENTE (XDR *xdrs, CLIENTE *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_pointer (xdrs, (char **)&objp->nombrecompleto, sizeof (char), (xdrproc_t) xdr_char))
+		 return FALSE;
+	 if (!xdr_int (xdrs, &objp->edad))
+		 return FALSE;
+	 if (!xdr_pointer (xdrs, (char **)&objp->provincia, sizeof (char), (xdrproc_t) xdr_char))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
 xdr_INPUT_A (XDR *xdrs, INPUT_A *objp)
 {
 	register int32_t *buf;
@@ -27,6 +41,17 @@ xdr_INPUT_B (XDR *xdrs, INPUT_B *objp)
 	 if (!xdr_int (xdrs, &objp->edad))
 		 return FALSE;
 	 if (!xdr_pointer (xdrs, (char **)&objp->provincia, sizeof (char), (xdrproc_t) xdr_char))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
+xdr_OUTPUT_A_B (XDR *xdrs, OUTPUT_A_B *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_array (xdrs, (char **)&objp->a.a_val, (u_int *) &objp->a.a_len, ~0,
+		sizeof (CLIENTE), (xdrproc_t) xdr_CLIENTE))
 		 return FALSE;
 	return TRUE;
 }
