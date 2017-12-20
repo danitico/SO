@@ -1,2 +1,1 @@
-Estas son las prácticas de Sistemas Operativos
-TERMINADO JOPUTA
+Estas son las prácticas de Sistemas Operativos.
